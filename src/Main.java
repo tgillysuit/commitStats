@@ -11,19 +11,22 @@ public class Main {
         System.out.print("Enter the CSV filename: ");
         String f = s.nextLine();
 
+        // Reading in the .csv file and dividing up the file that has a comma in it.
         List<Map<String, String>> dta = new ArrayList<>();
         try (Scanner fs = new Scanner(new File(f))) {
             fs.nextLine();
 
+            // Looking for the next line in the csv file
             while (fs.hasNextLine()) {
+                // Seperates each column with the approriate column.
                 String[] v = fs.nextLine().split(",");
 
-                int chg = Integer.parseInt(v[2]);  
-
+                int chg = Integer.parseInt(v[2]); 
+                // Creates a new map for that push 
                 Map<String, String> mp1 = new HashMap<>();
-                mp1.put("id", v[0]);  
-                mp1.put("tm", v[1]);  
-                mp1.put("chg", String.valueOf(chg));
+                mp1.put("id", v[0]);  // Fork Number
+                mp1.put("tm", v[1]);  // Timestamp
+                mp1.put("chg", String.valueOf(chg)); // The commits made after that push
                 dta.add(mp1);
             }
         } catch (FileNotFoundException e) {
