@@ -11,20 +11,20 @@ public class Main {
         System.out.print("Enter the CSV filename: ");
         String f = s.nextLine();
 
-        List<Map<String, String>> data = new ArrayList<>();
-        try (Scanner fileScanner = new Scanner(new File(f))) {
-            fileScanner.nextLine();
+        List<Map<String, String>> dta = new ArrayList<>();
+        try (Scanner fs = new Scanner(new File(f))) {
+            fs.nextLine();
 
-            while (fileScanner.hasNextLine()) {
-                String[] v = fileScanner.nextLine().split(",");
+            while (fs.hasNextLine()) {
+                String[] v = fs.nextLine().split(",");
 
-                int change = Integer.parseInt(v[2]);  
+                int chg = Integer.parseInt(v[2]);  
 
-                Map<String, String> map = new HashMap<>();
-                map.put("id", v[0]);  
-                map.put("time", v[1]);  
-                map.put("change", String.valueOf(change));
-                data.add(map);
+                Map<String, String> mp1 = new HashMap<>();
+                mp1.put("id", v[0]);  
+                mp1.put("tm", v[1]);  
+                mp1.put("chg", String.valueOf(chg));
+                dta.add(mp1);
             }
         } catch (FileNotFoundException e) {
             System.out.println("Error reading the file: " + e.getMessage());
@@ -32,71 +32,71 @@ public class Main {
             return;
         }
 
-        Map<String, List<Map<String, String>>> map = new HashMap<>();
-        for (Map<String, String> d : data) {
+        Map<String, List<Map<String, String>>> mp2 = new HashMap<>();
+        for (Map<String, String> d : dta) {
             String id = d.get("id");
-            List<Map<String, String>> list = map.get(id);
-            if (list == null) {
-                list = new ArrayList<>();
-                map.put(id, list);
+            List<Map<String, String>> lst = mp2.get(id);
+            if (lst == null) {
+                lst = new ArrayList<>();
+                mp2.put(id, lst);
             }
-            list.add(d);
+            lst.add(d);
         }
-        int count = map.size();
+        int cnt = mp2.size();
 
-        System.out.println("There are " + count + " forks available (fork1 to fork" + count + ").");
+        System.out.println("There are " + cnt + " forks available (fork1 to fork" + cnt + ").");
         System.out.print("Enter the fork number to analyze (or 'all' for all forks): ");
-        String input = s.nextLine();
+        String inp = s.nextLine();
 
-        List<Map<String, String>> selected;
-        if (input.equalsIgnoreCase("all")) {
-            selected = data;
+        List<Map<String, String>> sel;
+        if (inp.equalsIgnoreCase("all")) {
+            sel = dta;
         } else {
-            String id = "fork" + input; 
-            selected = map.get(id);
+            String id = "fork" + inp; 
+            sel = mp2.get(id);
         }
 
-        int size = selected.size();
+        int sz = sel.size();
 
         DateTimeFormatter f1 = DateTimeFormatter.ISO_DATE_TIME;
-        LocalDateTime latest = null;
-        for (Map<String, String> d : selected) {
-            LocalDateTime t = LocalDateTime.parse(d.get("time"), f1); 
-            if (latest == null || t.isAfter(latest)) {
-                latest = t;
+        LocalDateTime lat = null;
+        for (Map<String, String> d : sel) {
+            LocalDateTime t = LocalDateTime.parse(d.get("tm"), f1); 
+            if (lat == null || t.isAfter(lat)) {
+                lat = t;
             }
         }
         DateTimeFormatter f2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String latestTime = latest.format(f2);
+        String latT = lat.format(f2);
 
-        double total = 0.0;
-        int totalLinesChanged = 0;
-        for (Map<String, String> d : selected) {
-            int linesChanged = Integer.parseInt(d.get("change"));
-            total += linesChanged;
-            totalLinesChanged += linesChanged;
+        double tot = 0.0;
+        int tlc = 0;
+        for (Map<String, String> d : sel) {
+            int lc = Integer.parseInt(d.get("chg"));
+            tot += lc;
+            tlc += lc;
         }
-        double avg = total / size;
+        double avg = tot / sz;
 
-        int max = Integer.MIN_VALUE;
-        int min = Integer.MAX_VALUE;
-        for (Map<String, String> d : selected) {
-            int change = Integer.parseInt(d.get("change"));
-            if (change > max) {
-                max = change;
+        int mx = Integer.MIN_VALUE;
+        int mn = Integer.MAX_VALUE;
+        for (Map<String, String> d : sel) {
+            int chg = Integer.parseInt(d.get("chg"));
+            if (chg > mx) {
+                mx = chg;
             }
-            if (change < min) {
-                min = change;
+            if (chg < mn) {
+                mn = chg;
             }
         }
 
         System.out.println("\nStatistics:");
-        System.out.println("Number of commits: " + size);
-        System.out.println("Most recent commit timestamp: " + latestTime);
+        System.out.println("Number of commits: " + sz);
+        System.out.println("Most recent commit timestamp: " + latT);
         System.out.printf("Average lines changed per commit: %.2f\n", avg);
-        System.out.println("Total lines changed across all commits: " + totalLinesChanged);
-        System.out.println("Max lines changed in a commit: " + max);
-        System.out.println("Min lines changed in a commit: " + min);
+        System.out.println("Total lines changed across all commits: " + tlc);
+        System.out.println("Max lines changed in a commit: " + mx);
+        System.out.println("Min lines changed in a commit: " + mn);
 
         s.close();
     }
