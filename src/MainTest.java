@@ -11,7 +11,7 @@ public class MainTest {
     @Test
     void testParseCSV() {
       // You will finish implementing this method in Wave 3
-      // TODO: Call parseCSV("data/small_commit_data.csv") here and set it to an actual variable
+      // TODO: Call Main.parseCSV("data/small_commit_data.csv") here and set it to an actual variable
 
 
       // Sets up the expected value for you. You do not need to edit this part
