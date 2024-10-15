@@ -60,7 +60,7 @@ public class Main {
         }
 
         int sz = sel.size();
-
+        // Formats the timestamp into the a readable date and time.
         DateTimeFormatter f1 = DateTimeFormatter.ISO_DATE_TIME;
         LocalDateTime lat = null;
         for (Map<String, String> d : sel) {
