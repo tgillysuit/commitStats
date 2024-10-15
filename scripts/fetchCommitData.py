@@ -30,12 +30,14 @@ def get_forks(owner, repo, headers):
                 time.sleep(sleep_time)
     return forks
 
-def get_commits(owner, repo, headers):
+def get_commits(owner, repo, headers, since=None):
     commits = []
     page = 1
     while True:
         url = f'https://api.github.com/repos/{owner}/{repo}/commits'
         params = {'page': page, 'per_page': 100}
+        if since:
+            params['since'] = since
         response = requests.get(url, headers=headers, params=params)
         if response.status_code != 200:
             print(f"Error fetching commits for {owner}/{repo}: {response.status_code}")
@@ -67,6 +69,7 @@ def main():
     parser = argparse.ArgumentParser(description='Fetch commit data from GitHub forks.')
     parser.add_argument('username', help='GitHub username of the repository owner.')
     parser.add_argument('repo', help='Name of the repository.')
+    parser.add_argument('--after-hash', '-a', help='Only include commits after this commit hash.')
     args = parser.parse_args()
 
     token = getpass.getpass('Enter your GitHub Personal Access Token (leave blank for unauthenticated requests): ')
@@ -74,6 +77,15 @@ def main():
     headers = {}
     if token:
         headers['Authorization'] = f'token {token}'
+
+    after_timestamp = None
+    if args.after_hash:
+        commit_details = get_commit_details(args.username, args.repo, args.after_hash, headers)
+        if not commit_details:
+            print(f"Commit hash {args.after_hash} not found in {args.username}/{args.repo}")
+            sys.exit(1)
+        after_timestamp = commit_details['commit']['committer']['date']
+        print(f"Only including commits after {args.after_hash} ({after_timestamp})")
 
     print(f"Fetching forks for {args.username}/{args.repo}...")
     forks = get_forks(args.username, args.repo, headers)
@@ -90,7 +102,7 @@ def main():
             fork_owner = fork['owner']['login']
             fork_repo = fork['name']
             print(f"Processing {fork_owner}/{fork_repo} as {fork_id}...")
-            commits = get_commits(fork_owner, fork_repo, headers)
+            commits = get_commits(fork_owner, fork_repo, headers, since=after_timestamp)
             for commit in commits:
                 sha = commit['sha']
                 commit_details = get_commit_details(fork_owner, fork_repo, sha, headers)
