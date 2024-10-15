@@ -29,12 +29,13 @@ public class Main {
                 mp1.put("chg", String.valueOf(chg)); // The commits made after that push
                 dta.add(mp1);
             }
+        // catching a nonexistent file and throwing an error.
         } catch (FileNotFoundException e) {
             System.out.println("Error reading the file: " + e.getMessage());
             s.close();
             return;
         }
-
+        // Searching the total commits that have been pushed with the appropriate fork id.
         Map<String, List<Map<String, String>>> mp2 = new HashMap<>();
         for (Map<String, String> d : dta) {
             String id = d.get("id");
@@ -46,11 +47,11 @@ public class Main {
             lst.add(d);
         }
         int cnt = mp2.size();
-
+        // Prints out the total commits.
         System.out.println("There are " + cnt + " forks available (fork1 to fork" + cnt + ").");
         System.out.print("Enter the fork number to analyze (or 'all' for all forks): ");
         String inp = s.nextLine();
-
+        // When prompted the user will select a number and it will gather the data to the appropriate fork id.
         List<Map<String, String>> sel;
         if (inp.equalsIgnoreCase("all")) {
             sel = dta;
@@ -58,9 +59,9 @@ public class Main {
             String id = "fork" + inp; 
             sel = mp2.get(id);
         }
-
+        // returns the size of the id that's selected
         int sz = sel.size();
-
+        
         DateTimeFormatter f1 = DateTimeFormatter.ISO_DATE_TIME;
         LocalDateTime lat = null;
         for (Map<String, String> d : sel) {
