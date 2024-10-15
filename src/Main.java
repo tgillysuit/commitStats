@@ -13,46 +13,21 @@ public class Main {
 
         List<Map<String, String>> data = new ArrayList<>();
         try (Scanner fileScanner = new Scanner(new File(f))) {
-            boolean first = true;
+            fileScanner.nextLine();
 
             while (fileScanner.hasNextLine()) {
-                String l = fileScanner.nextLine();
-                if (first) {
-                    first = false;
-                    continue;
-                }
+                String[] v = fileScanner.nextLine().split(",");
 
-                String[] v = l.split(",");
-                if (v.length != 3) {
-                    continue;
-                }
-
-                String id = v[0];
-                String time = v[1];
-                String changeStr = v[2];
-                int change;
-
-                try {
-                    change = Integer.parseInt(changeStr);
-                } catch (NumberFormatException e) {
-                    change = 0;
-                }
+                int change = Integer.parseInt(v[2]);  
 
                 Map<String, String> map = new HashMap<>();
-                map.put("id", id);
-                map.put("time", time);
+                map.put("id", v[0]);  
+                map.put("time", v[1]);  
                 map.put("change", String.valueOf(change));
                 data.add(map);
             }
         } catch (FileNotFoundException e) {
             System.out.println("Error reading the file: " + e.getMessage());
-            s.close();
-            return;
-        }
-
-        if (data.isEmpty()) {
-            System.out.println("No data found in the file.");
-            s.close();
             return;
         }
 
@@ -72,30 +47,12 @@ public class Main {
         System.out.print("Enter the fork number to analyze (or 'all' for all forks): ");
         String input = s.nextLine();
 
-        List<Map<String, String>> selected = new ArrayList<>();
+        List<Map<String, String>> selected;
         if (input.equalsIgnoreCase("all")) {
             selected = data;
         } else {
-            try {
-                int n = Integer.parseInt(input);
-                if (n < 1 || n > count) {
-                    System.out.println("Invalid number.");
-                    s.close();
-                    return;
-                }
-                String id = "fork" + n;
-                List<Map<String, String>> l = map.get(id);
-                if (l == null || l.isEmpty()) {
-                    System.out.println("No data found for " + id + ".");
-                    s.close();
-                    return;
-                }
-                selected = l;
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input.");
-                s.close();
-                return;
-            }
+            String id = "fork" + input; 
+            selected = map.get(id);
         }
 
         int size = selected.size();
@@ -103,24 +60,13 @@ public class Main {
         DateTimeFormatter f1 = DateTimeFormatter.ISO_DATE_TIME;
         LocalDateTime latest = null;
         for (Map<String, String> d : selected) {
-            String time = d.get("time");
-            LocalDateTime t;
-            try {
-                t = LocalDateTime.parse(time, f1);
-            } catch (Exception e) {
-                continue;
-            }
+            LocalDateTime t = LocalDateTime.parse(d.get("time"), f1); 
             if (latest == null || t.isAfter(latest)) {
                 latest = t;
             }
         }
-        String latestTime;
-        if (latest != null) {
-            DateTimeFormatter f2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            latestTime = latest.format(f2);
-        } else {
-            latestTime = "N/A";
-        }
+        DateTimeFormatter f2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String latestTime = latest.format(f2);
 
         double total = 0.0;
         int totalLinesChanged = 0;
