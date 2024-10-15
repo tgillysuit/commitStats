@@ -12,7 +12,7 @@ public class Main {
         String f = s.nextLine();
 
         // Reading in the .csv file and dividing up the file that has a comma in it.
-        List<Map<String, String>> dta = new ArrayList<>();
+        List<Map<String, String>> data = new ArrayList<>();
         try (Scanner fs = new Scanner(new File(f))) {
             fs.nextLine();
 
@@ -23,11 +23,11 @@ public class Main {
 
                 int chg = Integer.parseInt(v[2]); 
                 // Creates a new map for that push 
-                Map<String, String> mp1 = new HashMap<>();
-                mp1.put("id", v[0]);  // Fork Number
-                mp1.put("tm", v[1]);  // Timestamp
-                mp1.put("chg", String.valueOf(chg)); // The commits made after that push
-                dta.add(mp1);
+                Map<String, String> pushes = new HashMap<>();
+                pushes.put("id", v[0]);  // Fork Number
+                pushes.put("tm", v[1]);  // Timestamp
+                pushes.put("chg", String.valueOf(chg)); // The commits made after that push
+                data.add(pushes);
             }
         // catching a nonexistent file and throwing an error.
         } catch (FileNotFoundException e) {
@@ -37,7 +37,7 @@ public class Main {
         }
         // Searching the total commits that have been pushed with the appropriate fork id.
         Map<String, List<Map<String, String>>> mp2 = new HashMap<>();
-        for (Map<String, String> d : dta) {
+        for (Map<String, String> d : data) {
             String id = d.get("id");
             List<Map<String, String>> lst = mp2.get(id);
             if (lst == null) {
@@ -54,7 +54,7 @@ public class Main {
         // When prompted the user will select a number and it will gather the data to the appropriate fork id.
         List<Map<String, String>> sel;
         if (inp.equalsIgnoreCase("all")) {
-            sel = dta;
+            sel = data;
         } else {
             String id = "fork" + inp; 
             sel = mp2.get(id);
